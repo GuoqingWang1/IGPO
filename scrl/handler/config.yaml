@@ -1,0 +1,18 @@
+# Web Search Agent
+search_engine: "grt" # "bing"
+search_top_k: 10
+search_region: "us"
+search_lang: "en"
+page_view_port_size: 1024*40
+serper_api_key: ""
+
+reading_agent_model: "qwen-max-2025-01-25"
+
+azure_bing_search_subscription_key: "key here if you use azure bing"
+azure_bing_search_mkt: "zh-CN" # "en-US"
+
+query_save_path: "./scrl/handler/cache/search_result.json"
+
+server_url_list:
+  - ""
+  # - "http://xxx:5000"

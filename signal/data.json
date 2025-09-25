@@ -1,0 +1,18 @@
+[
+    {
+        "idx": 0,
+        "question": "what happened to ray lake of the real thing",
+        "think": " I need to find information about Ray Lake from \"The Real Thing\" to answer this question. I will start with a web search. ",
+        "tool_call": {
+            "arguments": {
+                "query": [
+                    "Ray Lake The Real Thing",
+                    "Ray Lake update",
+                    "what happened to Ray Lake"
+                ]
+            },
+            "name": "web_search"
+        },
+        "total_number": 1
+    }
+]
