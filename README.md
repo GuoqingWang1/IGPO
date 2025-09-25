@@ -123,6 +123,6 @@ You can check the score in ```./evaluate/{experiment_name}_score.json```
 
 ## 🙏 Acknowledgement 
 
-IGPO is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1), with its implementation built upon [veRL](https://github.com/volcengine/verl), [Search-r1](https://github.com/PeterGriffinJin/Search-R1), and [DeepResearcher](https://github.com/GAIR-NLP/DeepResearcher). We sincerely thank the teams behind these projects for their valuable contributions to open-source research and development. We are grateful to the teams behind these projects for their significant contributions to open-source research and development.
+IGPO is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1), with its implementation built upon [veRL](https://github.com/volcengine/verl), [Search-r1](https://github.com/PeterGriffinJin/Search-R1), and [DeepResearcher](https://github.com/GAIR-NLP/DeepResearcher). We are grateful to the teams behind these projects for their significant contributions to open-source research and development.
 
 
