@@ -125,4 +125,14 @@ You can check the score in ```./evaluate/{experiment_name}_score.json```
 
 IGPO is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1), with its implementation built upon [veRL](https://github.com/volcengine/verl), [Search-r1](https://github.com/PeterGriffinJin/Search-R1), and [DeepResearcher](https://github.com/GAIR-NLP/DeepResearcher). We are grateful to the teams behind these projects for their significant contributions to open-source research and development.
 
+## Citation
+If you find our code or work useful for your research, please cite our work.
+```
+@article{wang2025informationg,
+      title={Information Gain-based Policy Optimization: A Simple and Effective Approach for Multi-Turn LLM Agents}, 
+      author={Wang, Guoqing and Dai, Sunhao and Ye, Guangze and Gan, Zeyu and Yao, Wei and Deng, Yong and Wu, Xiaofeng and Ying, Zhenzhe},
+      journal={arXiv preprint arXiv:2510.14967},
+      year={2025}
+}
+```
 
