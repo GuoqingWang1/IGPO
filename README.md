@@ -86,12 +86,12 @@ After launching all server handlers, you can replace ```server_url_list``` in ``
 ```
 
 ### 🏋️‍♂️ Training the model
-Step: Set the Prompt
+Step1: Set the Prompt
 
 The system prompt for our model can be found in:
 
 ```bash
- ./scrl/handler/config.yaml (line 25)
+ ./tool_server/config.yaml (line 13)
 ```
 
 
