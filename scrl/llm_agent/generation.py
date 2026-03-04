@@ -255,7 +255,7 @@ class LLMGenerationManager:
         batch_size = idx.size(0)
         eos_token_id = self.tokenizer.eos_token_id
         non_tensor_batch = prompts.non_tensor_batch
-        response = pad_2d_list_to_length(response, self.tokenizer.pad_token_id, max_length=2000).to(idx.device)
+        response = pad_2d_list_to_length(response, self.tokenizer.pad_token_id).to(idx.device)
 
         seq = torch.cat([idx, response], dim=-1)
 
@@ -493,10 +493,17 @@ class LLMGenerationManager:
                         info_gain_rollings_active.batch['attention_mask'][activate_list[i], :] = rollings_active.batch['attention_mask'][i]
                         info_gain_rollings_active.batch['position_ids'][activate_list[i], :] = rollings_active.batch['position_ids'][i]
                 else:
-                    for i in range(len(activate_list)):   
-                        info_gain_rollings_active.batch['input_ids'][activate_list[i], :len(rollings_active.batch['input_ids'][i])] = rollings_active.batch['input_ids'][i]
-                        info_gain_rollings_active.batch['attention_mask'][activate_list[i], :len(rollings_active.batch['attention_mask'][i])] = rollings_active.batch['attention_mask'][i]
-                        info_gain_rollings_active.batch['position_ids'][activate_list[i], :len(rollings_active.batch['position_ids'][i])] = rollings_active.batch['position_ids'][i]    
+                    src_len = rollings_active.batch['input_ids'].shape[1]
+                    ig_len = info_gain_rollings_active.batch['input_ids'].shape[1]
+                    for i in range(len(activate_list)):
+                        idx = activate_list[i]
+                        info_gain_rollings_active.batch['input_ids'][idx, :src_len] = rollings_active.batch['input_ids'][i]
+                        info_gain_rollings_active.batch['attention_mask'][idx, :src_len] = rollings_active.batch['attention_mask'][i]
+                        info_gain_rollings_active.batch['position_ids'][idx, :src_len] = rollings_active.batch['position_ids'][i]
+                        if src_len < ig_len:
+                            info_gain_rollings_active.batch['input_ids'][idx, src_len:] = self.tokenizer.pad_token_id
+                            info_gain_rollings_active.batch['attention_mask'][idx, src_len:] = 0
+                            info_gain_rollings_active.batch['position_ids'][idx, src_len:] = 0
             
             pseudo_gen_output = self.pseudo_generate_sequences(info_gain_rollings_active, pseudo_resps_with_gt)
             
@@ -595,6 +602,7 @@ class LLMGenerationManager:
                         
                         # Check for nan in mean_log_prob
                         if math.isnan(mean_log_prob):
+                            info_gain_rewards[i].append(0.0)
                             continue
                         
                         prev_value = gt_values[i]  # Save previous value for verification
@@ -610,6 +618,7 @@ class LLMGenerationManager:
                         
                         # Check for nan/inf in info_gain
                         if math.isnan(info_gain) or math.isinf(info_gain):
+                            info_gain_rewards[i].append(0.0)
                             continue
                         
                         info_gain_rewards[i].append(info_gain)
@@ -757,8 +766,8 @@ class LLMGenerationManager:
                 gt_idx = vectorized_data_collector['gt_idx']
                 
                 # Step 1: Collect all turns' data
-                # Note: pseudo_generate_sequences already pads responses to max_length=2000
-                # So all turns have the same response length, no need to reconstruct
+                # Note: pseudo_generate_sequences pads responses to the max GT length in the batch.
+                # Since pseudo_resps_with_gt is fixed across all turns, response width is uniform.
                 all_input_ids = []
                 all_attention_mask = []
                 all_position_ids = []
@@ -983,9 +992,9 @@ class LLMGenerationManager:
         prompts_repeated = prompts_repeated.gather(1, sorted_indices)
         prompts_attention_mask = prompts_tokenizered['attention_mask'].gather(1, sorted_indices)
 
-        responses = self.tokenizer(response_str_list, return_tensors="pt",padding=True)['input_ids']
-        
-        responses_attention_mask = self.tokenizer(response_str_list, return_tensors="pt",padding=True)['attention_mask']
+        _tokenized_responses = self.tokenizer(response_str_list, return_tensors="pt", padding=True)
+        responses = _tokenized_responses['input_ids']
+        responses_attention_mask = _tokenized_responses['attention_mask']
         attention_mask = torch.cat((prompts_attention_mask, responses_attention_mask), dim=-1)
         position_ids = self.tensor_fn.create_position_ids(attention_mask)
         

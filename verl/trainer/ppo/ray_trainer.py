@@ -742,6 +742,9 @@ class RayPPOTrainer:
 
                 data_source_lst.append(test_batch.non_tensor_batch.get("data_source", ["unknown"] * reward_tensor.shape[0]))
         else:
+            f1_scores_lst = []
+            em_scores_lst = []
+            noformatf1_scores_lst = []
             for batch_dict in self.val_dataloader:
                 timing_raw = {}
                 test_batch: DataProto = DataProto.from_single_dict(batch_dict)
@@ -798,9 +801,9 @@ class RayPPOTrainer:
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
                     try:
                         reward_dict = self.val_reward_fn(test_batch, info_gain_rewards=info_gain_rewards, is_validation=True)
-                        f1_scores = reward_dict["f1_scores"]
-                        em_scores = reward_dict["em_scores"]
-                        noformatf1_scores = reward_dict["noformatf1_scores"]
+                        f1_scores_lst.extend(reward_dict["f1_scores"])
+                        em_scores_lst.extend(reward_dict["em_scores"])
+                        noformatf1_scores_lst.extend(reward_dict["noformatf1_scores"])
                         reward_tensor = reward_dict["reward_tensor"]
                     except:
                         import traceback
@@ -809,6 +812,9 @@ class RayPPOTrainer:
                         exit()
 
                 data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * reward_tensor.shape[0]))
+            f1_scores = f1_scores_lst
+            em_scores = em_scores_lst
+            noformatf1_scores = noformatf1_scores_lst
 
         data_sources = np.concatenate(data_source_lst, axis=0)
 		
@@ -1224,6 +1230,8 @@ class RayPPOTrainer:
                             self.wait_reward_step.append(self.global_steps)
                             if self.config.data.custom_train_cls.name == 'AsycRMDataset':
                                 train_reward_type = 'empty'
+                            if info_gain_rewards is not None:
+                                batch.non_tensor_batch["info_gain_rewards"] = np.array(info_gain_rewards, dtype=object)
                             future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer, self.global_steps, train_reward_type)
                         else:
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn, train_reward_type, info_gain_rewards=info_gain_rewards)
@@ -1386,7 +1394,7 @@ class RayPPOTrainer:
                 n_gpus = self.resource_pool_manager.get_n_gpus()
                 metrics.update(compute_throughout_metrics(batch=batch, timing_raw=timing_raw, n_gpus=n_gpus))
                 
-                if is_last_step or self.global_steps % self.config.trainer.test_freq == 0:
+                if is_last_step or (self.config.trainer.test_freq > 0 and self.global_steps % self.config.trainer.test_freq == 0):
                     val_data_dir = self.config.trainer.get("validation_data_dir", None)
                     if val_data_dir:
                         json.dump(metrics,open(f'{val_data_dir}/metric_step_{self.global_steps}.json','w'))

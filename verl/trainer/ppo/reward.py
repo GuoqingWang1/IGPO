@@ -171,12 +171,16 @@ def compute_reward(data: DataProto, reward_fn, val_type, info_gain_rewards=None)
         Tuple of reward tensor and extra info dictionary.
     """
     try:
-        reward_result = reward_fn(data, return_dict=True,val_type=val_type, info_gain_rewards=info_gain_rewards)
+        reward_result = reward_fn(data, return_dict=True, val_type=val_type, info_gain_rewards=info_gain_rewards)
         reward_tensor = reward_result["reward_tensor"]
         reward_extra_infos_dict = reward_result["reward_extra_info"]
     except Exception as e:
         print(f"Error in reward_fn: {e}")
-        reward_tensor = reward_fn(data)
+        try:
+            reward_tensor = reward_fn(data, info_gain_rewards=info_gain_rewards)
+        except Exception as e2:
+            print(f"Retry with info_gain also failed: {e2}, falling back to no info_gain")
+            reward_tensor = reward_fn(data)
         reward_extra_infos_dict = {}
 
     return reward_tensor, reward_extra_infos_dict
@@ -192,7 +196,10 @@ def compute_reward_async(data: DataProto, config, tokenizer, global_steps, val_t
     reward_fn = load_train_reward_manager(config, tokenizer, num_examine=0, **config.reward_model.get("reward_kwargs", {}))
     if val_type == 'empty':
         return None, None
-    reward_tensor, reward_extra_infos_dict = compute_reward(data, reward_fn,val_type=val_type)
+    info_gain_rewards = None
+    if "info_gain_rewards" in data.non_tensor_batch:
+        info_gain_rewards = [list(x) for x in data.non_tensor_batch["info_gain_rewards"]]
+    reward_tensor, reward_extra_infos_dict = compute_reward(data, reward_fn, val_type=val_type, info_gain_rewards=info_gain_rewards)
     data.batch["token_level_scores"] = reward_tensor
     if reward_extra_infos_dict:
         data.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})

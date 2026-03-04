@@ -32,6 +32,7 @@ def _compute_turn_level_advantage(
     bsz: int,
     seq_len: int,
     device: torch.device,
+    turn_boundary_mask: torch.Tensor = None,
 ) -> torch.Tensor:
     """
     Turn-level discounted accumulation + broadcast implementation.
@@ -50,6 +51,9 @@ def _compute_turn_level_advantage(
         bsz: batch size
         seq_len: Sequence length
         device: Device
+        turn_boundary_mask: Optional pre-computed mask (bsz, seq_len) identifying
+            turn boundary positions. When provided, used instead of != 0 heuristic
+            to avoid missing boundaries where normalized rewards happen to be zero.
     
     Returns:
         discounted_returns: Turn-level advantage broadcast to all tokens (bsz, seq_len)
@@ -61,7 +65,10 @@ def _compute_turn_level_advantage(
         sample_mask = response_mask[sample_idx]  # (seq_len,)
         
         # Step 1: Find all reward positions (turn end positions)
-        reward_positions = (sample_rewards != 0).nonzero(as_tuple=True)[0].tolist()
+        if turn_boundary_mask is not None:
+            reward_positions = turn_boundary_mask[sample_idx].nonzero(as_tuple=True)[0].tolist()
+        else:
+            reward_positions = (sample_rewards != 0).nonzero(as_tuple=True)[0].tolist()
         
         if len(reward_positions) == 0:
             # No reward, skip
@@ -312,6 +319,8 @@ def compute_grpo_outcome_advantage(
     # ========== Step 5: Turn-level discounted accumulation + broadcast ==========
     # Each turn's advantage is computed through turn-level discounted accumulation
     # Then broadcast to all tokens in that turn
+    # Use f1_mask | ig_mask (computed before normalization) as turn boundaries
+    # to avoid missing turns whose normalized reward happens to be zero.
     discounted_returns = _compute_turn_level_advantage(
         normalized_rewards=normalized_rewards,
         response_mask=response_mask,
@@ -319,6 +328,7 @@ def compute_grpo_outcome_advantage(
         bsz=bsz,
         seq_len=seq_len,
         device=device,
+        turn_boundary_mask=f1_mask | ig_mask,
     )
 
     return discounted_returns, discounted_returns

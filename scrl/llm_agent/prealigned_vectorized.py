@@ -337,6 +337,7 @@ def compute_vectorized_gt_logprob(
                 mean_log_prob = log_probs.mean().item()
                 
                 if math.isnan(mean_log_prob):
+                    info_gain_rewards[global_idx].append(0.0)
                     continue
                 
                 # Store for validation
@@ -350,6 +351,7 @@ def compute_vectorized_gt_logprob(
                     info_gain = cur_value - gt_values[global_idx]
                 
                 if math.isnan(info_gain) or math.isinf(info_gain):
+                    info_gain_rewards[global_idx].append(0.0)
                     continue
                 
                 info_gain_rewards[global_idx].append(info_gain)
