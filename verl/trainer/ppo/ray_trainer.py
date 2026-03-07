@@ -643,6 +643,8 @@ class RayPPOTrainer:
         sample_outputs = []
         sample_scores = []
         ground_truths = []
+        reward_tensor_all = []
+        info_gain_rewards_all = []
 
         gen_config = GenerationConfig(
             max_turns=self.config.max_turns,
@@ -805,6 +807,8 @@ class RayPPOTrainer:
                         em_scores_lst.extend(reward_dict["em_scores"])
                         noformatf1_scores_lst.extend(reward_dict["noformatf1_scores"])
                         reward_tensor = reward_dict["reward_tensor"]
+                        reward_tensor_all.extend(reward_tensor.tolist())
+                        info_gain_rewards_all.extend(info_gain_rewards)
                     except:
                         import traceback
                         print(f"----- {str(traceback.format_exc())}")
@@ -848,8 +852,8 @@ class RayPPOTrainer:
                 outputs=sample_outputs,
                 reward_extra_infos_dict=reward_extra_infos_dict,
                 dump_path=val_data_dir,
-				rewards=reward_tensor.tolist(),
-				info_gain_rewards=info_gain_rewards,
+				rewards=reward_tensor_all if reward_tensor_all else reward_tensor.tolist(),
+				info_gain_rewards=info_gain_rewards_all if info_gain_rewards_all else info_gain_rewards,
 				f1_scores=f1_scores,
 				em_scores=em_scores,
 				noformatf1_scores=noformatf1_scores,
