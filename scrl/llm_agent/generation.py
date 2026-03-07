@@ -210,21 +210,21 @@ class LLMGenerationManager:
                 if "</think>" not in content or "</answer>" not in content:
                     results.append((True, "", ""))
                 else:
-                    think = content.split("<think>")[1].split("</think>")[0]
+                    think_content = content.split("<think>")[1].split("</think>")[0]
                     answer = content.split("<answer>")[1].split("</answer>")[0]
-                    results.append((True, think, answer))
+                    results.append((True, think_content, answer))
             elif "<think>" in content and "<tool_call>" in content and self.codeact_env_disabled:
                 if "</tool_call>" not in content or "</think>" not in content:
                     results.append((True, "", ""))
                 else:
-                    think = content.split("<think>")[1].split("</think>")[0]
+                    think_content = content.split("<think>")[1].split("</think>")[0]
                     tool_call = content.split("<tool_call>")[1].split("</tool_call>")[0]
                     try:
                         tool_call = json.loads(tool_call)
                         assert "name" in tool_call, "no vliad function name in tool_call"
                         assert "arguments" in tool_call, "no valid arguments in tool_call"
                         assert tool_call["name"] not in [""], "invalid tool name"
-                        results.append((False, think, tool_call))
+                        results.append((False, think_content, tool_call))
                     except Exception as e:
                         if i < 10:
                             print(f"model tool call format error: {e}")
@@ -234,11 +234,11 @@ class LLMGenerationManager:
                 if "</code>" not in content or "</think>" not in content:
                     results.append((True, "", ""))
                 else:
-                    think = content.split("<think>")[1].split("</think>")[0]
+                    think_content = content.split("<think>")[1].split("</think>")[0]
                     code = content.split("<code>")[1].split("</code>")[0]
                     try:
                         tool_call = {"name":"code_act", "arguments":{"code":code}}
-                        results.append((False, think, tool_call))
+                        results.append((False, think_content, tool_call))
                     except Exception as e:
                         if i < 10:
                             print(f"model tool call format error: {e}")
@@ -263,15 +263,7 @@ class LLMGenerationManager:
         delta_position_id = torch.arange(1, response_length + 1, device=position_ids.device)
         delta_position_id = delta_position_id.unsqueeze(0).expand(batch_size, -1)
 
-        # FIX: Get the last VALID position_id for each sample (not just the last element of the tensor)
-        # This is important because info_gain_rollings_active may have stale values beyond valid_len
-        # 
-        # Problem: position_ids[..., -1:] takes the last element of the tensor, which might be stale
-        # Solution: Use attention_mask to find the actual last valid position for each sample
-        valid_lengths = attention_mask.sum(dim=1, keepdim=True).long()  # [batch_size, 1]
-        # Clamp to valid range and get the position_id at (valid_length - 1)
-        last_valid_indices = (valid_lengths - 1).clamp(min=0)  # [batch_size, 1]
-        last_valid_pos_ids = torch.gather(position_ids, dim=1, index=last_valid_indices)  # [batch_size, 1]
+        last_valid_pos_ids = (attention_mask.sum(dim=1, keepdim=True).long() - 1).clamp(min=0)
         response_position_ids = last_valid_pos_ids + delta_position_id
         position_ids = torch.cat([position_ids, response_position_ids], dim=-1)
         response_attention_mask = get_response_mask(response_id=response, eos_token=eos_token_id, dtype=attention_mask.dtype)

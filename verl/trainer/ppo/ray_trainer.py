@@ -1320,7 +1320,7 @@ class RayPPOTrainer:
                         # Curriculum Learning: dynamically adjust F1 and IG weights
                         use_curriculum = getattr(self.config.algorithm, 'use_curriculum', False)
                         if use_curriculum:
-                            total_steps = self.config.trainer.total_epochs * len(self.train_dataloader)
+                            total_steps = self.total_training_steps
                             progress = min(self.global_steps / max(total_steps, 1), 1.0)
                             # Read curriculum config
                             f1_init = getattr(self.config.algorithm, 'curriculum_f1_init', 0.5)

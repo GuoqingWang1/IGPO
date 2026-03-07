@@ -224,9 +224,7 @@ def compute_grpo_outcome_advantage(
 
     # ========== Step 1: Build masks ==========
     with torch.no_grad():
-        valid_lengths = response_mask.sum(dim=1).long()
-        last_valid_pos = torch.clamp(valid_lengths - 1, min=0)
-        
+        last_valid_pos = (seq_len - 1) - response_mask.flip(dims=[1]).to(torch.long).argmax(dim=1)
         position_indices = torch.arange(seq_len, device=device).unsqueeze(0).expand(bsz, -1)
         f1_mask = (position_indices == last_valid_pos.unsqueeze(1)) & (response_mask == 1)
         ig_mask = (response_mask == 1) & (~f1_mask) & (token_level_rewards != 0)
