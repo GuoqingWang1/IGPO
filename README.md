@@ -136,11 +136,13 @@ bash evaluate.sh
 ## 📄 Citation
 If you find our code or work useful for your research, please cite our work.
 ```bibtex
-@inproceedings{wang2026information,
-  title={Information Gain-based Policy Optimization: A Simple and Effective Approach for Multi-Turn Search Agents},
-  author={Wang, Guoqing and Dai, Sunhao and Ye, Guangze and Gan, Zeyu and Yao, Wei and Deng, Yong and Wu, Xiaofeng and Ying, Zhenzhe},
-  booktitle={The Fourteenth International Conference on Learning Representations},
-  year={2026}
+@inproceedings{
+wang2026information,
+title={Information Gain-based Policy Optimization: A Simple and Effective Approach for Multi-Turn Search Agents},
+author={Guoqing Wang and Sunhao Dai and Guangze Ye and Zeyu Gan and Wei Yao and Yong Deng and Xiaofeng Wu and Zhenzhe Ying},
+booktitle={The Fourteenth International Conference on Learning Representations},
+year={2026},
+url={https://openreview.net/forum?id=qkWP6phrvZ}
 }
 ```
 
