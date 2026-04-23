@@ -13,9 +13,13 @@
 </div>
 
 ## 📣 Latest News
+- **[Apr 21, 2026]**: We have successfully extended **IGPO** to handle ultra-long-horizon Deep Research tasks (200+ turns). Based on this, we trained **DR-Venus**, a frontier 4B deep research agent for edge-scale deployment. Empowered by **IGPO**, the performance of **DR-Venus** is effectively improved on challenging benchmarks, including **BrowseComp** and **BrowseComp-ZH**. For more details, please refer to the DR-Venus technical report [![DR-Venus](https://img.shields.io/badge/DR--Venus-arXiv-b31b1b.svg?logo=arxiv)](https://arxiv.org/pdf/2604.19859) [![DR-Venus](https://img.shields.io/badge/🤗%20DR--Venus-Hugging%20Face-yellow)](https://huggingface.co/papers/2604.19859), the released models [![DR-Venus-4B-RL](https://img.shields.io/badge/🤗%20DR--Venus--4B--RL-Hugging%20Face-yellow)](https://huggingface.co/inclusionAI/DR-Venus-4B-RL), and the IGPO training codebase within the DR-Venus codebase [![GitHub](https://img.shields.io/badge/Github-DR--Venus%2FRL-181717?logo=github&logoColor=white)](https://github.com/inclusionAI/DR-Venus/tree/master/RL).
 - **[Feb 01, 2026]**: 🔄 Codebase updated with new features. [See details](resources/CHANGELOG_20260201.md)
 - **[Jan 26, 2026]**: 🎉 Our **[IGPO](https://arxiv.org/abs/2510.14967)** paper has been accepted at **ICLR 2026**!
 - **[Oct 17, 2025]**: 📄 Our IGPO paper is now available on **[arXiv](https://arxiv.org/abs/2510.14967)** and **[Hugging Face](https://huggingface.co/papers/2510.14967)** daily paper.
+
+## 🤖Models
+[![DR-Venus-4B-RL](https://img.shields.io/badge/🤗%20DR--Venus--4B--RL-Hugging%20Face-yellow)](https://huggingface.co/inclusionAI/DR-Venus-4B-RL) [![DR-Venus-4B-RL-GGUF](https://img.shields.io/badge/🤗%20DR--Venus--4B--RL--GGUF-Hugging%20Face-yellow)](https://huggingface.co/inclusionAI/DR-Venus-4B-RL-GGUF)
 
 ## 💡 Method Overview
 We introduce IGPO, a RL algorithm for fine-grained credit assignment in search agent training. By modeling agentic search turns as an incremental information acquisition process, IGPO defines rewards as the marginal gain in the policy's probability of generating the correct answer. 
