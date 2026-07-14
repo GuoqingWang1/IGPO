@@ -167,8 +167,8 @@ This project is released under the [MIT License](LICENSE).
 
 <a href="https://star-history.com/#GuoqingWang1/IGPO&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=GuoqingWang1/IGPO&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=GuoqingWang1/IGPO&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=GuoqingWang1/IGPO&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="YOUR_GENERATED_URL" />
+   <source media="(prefers-color-scheme: light)" srcset="YOUR_GENERATED_URL" />
+   <img alt="Star History Chart" src="YOUR_GENERATED_URL" />
  </picture>
 </a>
