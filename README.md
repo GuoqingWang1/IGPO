@@ -29,6 +29,7 @@ We introduce IGPO, a RL algorithm for fine-grained credit assignment in search a
 </p>
 
 ## 📊 Overall Performance
+Updated with the final ICLR 2026 results. GiGPO performance is based on the word-level F1 reproduction reported in [BranPO](https://arxiv.org/pdf/2602.03719v1).
 <p align="center">
     <img src="./images/Exp.png" width="100%">
 </p>
